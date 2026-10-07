@@ -11,7 +11,17 @@
 
 ## 当前状态
 
-当前仓库是项目启动基线，包含可行性评估和 GitHub 项目创建记录。具体编辑器、排版引擎和 Codex CLI worker 将在后续提交中实现。
+当前仓库包含一个无依赖的漫画编辑器 MVP：主格、副格、底图、渐变和气泡是独立对象，可在 SVG 画布上选中、拖动、缩放和修改属性；页面按话和页管理，并提供项目 JSON/PNG 导出、资产绑定、版本安全回写和 Codex 任务队列入口。
+
+启动编辑器和本地 Codex 桥接服务：
+
+```powershell
+python services/server.py
+```
+
+访问 <http://127.0.0.1:8080/>。编辑器负责显示结果与人工调整，`services/codex_worker.py` 负责把排版任务和 `$imagegen` 生图任务交给 Codex CLI，并保存 JSONL 事件、结果文件和生成资产。
+
+本地服务还提供 `GET/PUT /api/project`、`GET/POST /api/assets`、`GET /api/jobs`、`POST /api/jobs`、`GET /api/jobs/{id}` 和 `POST /api/jobs/{id}/cancel`。`pipeline` 任务先让 Codex 返回结构化排版，再按面板提示词逐格生图；页面 revision 发生变化时，结果会保留为待人工应用，避免覆盖编辑。
 
 ## 记录
 

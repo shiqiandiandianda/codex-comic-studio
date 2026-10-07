@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/shiqiandiandianda/codex-comic-studio/blob/main/services/schema.json",
+  "title": "Codex Comic Studio interchange schema",
+  "type": "object",
+  "$defs": {
+    "asset": {
+      "type": "object",
+      "required": ["id", "kind", "path"],
+      "properties": {
+        "id": {"type": "string"},
+        "kind": {"type": "string", "enum": ["character", "prop", "background", "style", "reference", "other"]},
+        "path": {"type": "string", "description": "Local path sent to Codex CLI as a reference image."},
+        "label": {"type": "string"},
+        "notes": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "panel": {
+      "type": "object",
+      "required": ["id", "role", "rect"],
+      "properties": {
+        "id": {"type": "string"},
+        "role": {"type": "string", "enum": ["main", "sub"]},
+        "rect": {
+          "type": "object",
+          "required": ["x", "y", "width", "height"],
+          "properties": {
+            "x": {"type": "number"},
+            "y": {"type": "number"},
+            "width": {"type": "number", "exclusiveMinimum": 0},
+            "height": {"type": "number", "exclusiveMinimum": 0}
+          },
+          "additionalProperties": false
+        },
+        "prompt": {"type": "string"},
+        "asset_ids": {"type": "array", "items": {"type": "string"}},
+        "bubble_ids": {"type": "array", "items": {"type": "string"}},
+        "gradient_id": {"type": ["string", "null"]},
+        "image_path": {"type": ["string", "null"]}
+      },
+      "additionalProperties": true
+    },
+    "page": {
+      "type": "object",
+      "required": ["id", "width", "height", "panels"],
+      "properties": {
+        "id": {"type": "string"},
+        "width": {"type": "integer", "exclusiveMinimum": 0},
+        "height": {"type": "integer", "exclusiveMinimum": 0},
+        "panels": {"type": "array", "items": {"$ref": "#/$defs/panel"}},
+        "bubbles": {"type": "array", "items": {"type": "object"}},
+        "background": {"type": ["object", "null"]},
+        "gradient": {"type": ["object", "null"]}
+      },
+      "additionalProperties": true
+    },
+    "episode": {
+      "type": "object",
+      "required": ["id", "title", "pages"],
+      "properties": {
+        "id": {"type": "string"},
+        "title": {"type": "string"},
+        "pages": {"type": "array", "items": {"$ref": "#/$defs/page"}},
+        "assets": {"type": "array", "items": {"$ref": "#/$defs/asset"}},
+        "layout_reference_paths": {"type": "array", "items": {"type": "string"}},
+        "generation_standard": {"type": "string"},
+        "generation_standard_path": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "layout": {
+      "type": "object",
+      "required": ["episode_id", "pages"],
+      "properties": {
+        "episode_id": {"type": "string"},
+        "pages": {"type": "array", "items": {"$ref": "#/$defs/page"}},
+        "rules": {"type": "object"},
+        "layout_reference_paths": {"type": "array", "items": {"type": "string"}},
+        "generation_standard": {"type": "string"},
+        "generation_standard_path": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "layout_output": {
+      "$ref": "layout-output.schema.json"
+    },
+    "job": {
+      "type": "object",
+      "required": ["id", "type", "input"],
+      "properties": {
+        "id": {"type": "string"},
+        "type": {"type": "string", "enum": ["layout", "image"]},
+        "input": {"type": "object"},
+        "prompt": {"type": "string"},
+        "asset_paths": {"type": "array", "items": {"type": "string"}},
+        "max_retries": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": true
+    }
+  },
+  "oneOf": [
+    {"$ref": "#/$defs/episode"},
+    {"$ref": "#/$defs/layout"},
+    {"$ref": "#/$defs/layout_output"},
+    {"$ref": "#/$defs/job"}
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/shiqiandiandianda/codex-comic-studio/blob/main/services/layout-output.schema.json",
+  "title": "Codex Comic Studio editor layout result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["width", "height", "objects", "prompts"],
+  "properties": {
+    "width": {"type": "integer", "exclusiveMinimum": 0, "description": "Page width in pixels."},
+    "height": {"type": "integer", "exclusiveMinimum": 0, "description": "Page height in pixels."},
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "type", "name", "x", "y", "w", "h", "rotation", "opacity", "fill", "visible", "locked"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "type": {"type": "string", "enum": ["main", "sub", "base", "bubble", "gradient"]},
+          "name": {"type": "string"},
+          "x": {"type": "number"},
+          "y": {"type": "number"},
+          "w": {"type": "number", "minimum": 0},
+          "h": {"type": "number", "minimum": 0},
+          "rotation": {"type": "number"},
+          "opacity": {"type": "number", "minimum": 0, "maximum": 1},
+          "fill": {"type": "string"},
+          "visible": {"type": "boolean"},
+          "locked": {"type": "boolean"},
+          "parentId": {"type": ["string", "null"]},
+          "text": {"type": "string"},
+          "startColor": {"type": "string"},
+          "endColor": {"type": "string"},
+          "angle": {"type": "number"}
+        }
+      }
+    },
+    "prompts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["panel_id", "prompt", "asset_ids"],
+        "properties": {
+          "panel_id": {"type": "string", "minLength": 1},
+          "prompt": {"type": "string"},
+          "asset_ids": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    }
+  }
+}
