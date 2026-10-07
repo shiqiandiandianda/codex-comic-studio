@@ -97,6 +97,7 @@ class ServerContractTests(unittest.TestCase):
         status, original = self.request("GET", "/api/project")
         self.assertEqual(status, 200)
         project = {"episodes": [{"id": "contract-episode", "title": "Contract", "pages": []}]}
+        asset_id = None
         try:
             status, saved = self.request("PUT", "/api/project", project)
             self.assertEqual(status, 200)
@@ -116,6 +117,9 @@ class ServerContractTests(unittest.TestCase):
         finally:
             # Restore the user's project even when an assertion fails.
             self.request("PUT", "/api/project", original if isinstance(original, dict) else {"episodes": []})
+            if asset_id:
+                for path in self.server_module.ASSET_DIR.glob(f"{asset_id}.*"):
+                    path.unlink(missing_ok=True)
 
     def test_pipeline_job_keeps_target_page_identity_and_revision(self) -> None:
         page = {"id": "page-contract", "revision": 9, "width": 720, "height": 1000, "objects": []}
@@ -153,6 +157,8 @@ class ServerContractTests(unittest.TestCase):
             self.assertEqual(job.get("status"), "succeeded", job)
             self.assertEqual(job.get("page_id") or job.get("target_page_id"), page["id"])
             self.assertEqual(job.get("expected_revision"), page["revision"])
+            shutil.rmtree(self.server_module.JOB_DIR / str(job_id), ignore_errors=True)
+            self.server_module.JOBS.pop(str(job_id), None)
 
 
 if __name__ == "__main__":
